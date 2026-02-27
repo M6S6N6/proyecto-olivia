@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proyecto Olivia - Live</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root{ --azul:#1877f2; --fondo-fb: #f0f2f5; --texto-principal: #050505; --texto-secundario: #65676b; --borde-fb: #dadde1; }
+        *{ box-sizing:border-box; }
+        body{ margin:0; font-family: -apple-system, system-ui, sans-serif; background:var(--fondo-fb); color:var(--texto-principal); }
+        header{ background:white; position:fixed; width:100%; top:0; z-index:1000; border-bottom:1px solid var(--borde-fb); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .brandbar{ padding: 0 16px; display:flex; align-items:center; justify-content:space-between; height: 56px; }
+        #brandTitle{ font-size: 26px; font-weight: 900; color:var(--azul); font-family: 'Brush Script MT', cursive; italic; margin: 0; }
+        .navbar{ display:flex; justify-content:space-around; border-top: 1px solid rgba(0,0,0,0.05); }
+        .navItem{ cursor:pointer; padding: 12px; font-size: 13px; font-weight: 600; color: var(--texto-secundario); flex: 1; text-align: center; position: relative; }
+        .navItem.active{ color: var(--azul); }
+        .navItem.active::after{ content:""; position:absolute; left:0; bottom:0; width:100%; height:3px; background: var(--azul); }
+        .section{ padding:110px 10px 20px 10px; display:none; }
+        .show{ display:block; }
+        .card{ background:white; padding:15px; border-radius:8px; margin-bottom:12px; border: 1px solid var(--borde-fb); }
+        input, textarea{ width:100%; padding:12px; margin-top:8px; border-radius:8px; border:1px solid var(--borde-fb); font-size: 16px; }
+        button{ padding:12px; border:none; border-radius:8px; background:var(--azul); color:white; font-weight: bold; width: 100%; cursor:pointer; margin-top: 10px; }
+        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .modalOverlay{ position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:4000; padding: 20px; }
+        .modal{ background:#fff; border-radius:12px; padding:20px; width:100%; max-width:400px; }
+        .hidden { display: none; }
+        .btn-add { background: none; color: var(--azul); border: 1px solid var(--azul); border-radius: 50%; width: 35px; height: 35px; font-size: 24px; display: none; }
+    </style>
+</head>
+<body>
+
+<header id="mainHeader" class="hidden">
+    <div class="brandbar">
+        <div id="brandTitle">Proyecto Olivia</div>
+        <button id="btnAdd" class="btn-add" onclick="openPostEditor()">+</button>
+    </div>
+    <div class="navbar">
+        <div class="navItem" data-section="capsula" onclick="goTo('capsula', this)">Cápsula</div>
+        <div class="navItem" data-section="denuncias" onclick="goTo('denuncias', this)">Denuncias</div>
+        <div class="navItem" data-section="perfil" onclick="goTo('perfil', this)">Perfil</div>
+    </div>
+</header>
+
+<div id="loginScreen" class="section show">
+    <div class="card">
+        <h2 style="margin-top:0; color:var(--azul);">Bienvenido</h2>
+        <input id="newName" placeholder="Nombre completo" />
+        <input id="newEmail" type="email" placeholder="Correo electrónico" />
+        <input id="newPin" type="password" placeholder="PIN" />
+        <button id="loginBtn" onclick="handleAuth()">Entrar</button>
+    </div>
+</div>
+
+<div id="capsula" class="section"><div id="capsulaContainer"></div></div>
+<div id="denuncias" class="section"><div id="denunciasContainer"></div></div>
+<div id="perfil" class="section">
+    <div class="card" style="text-align:center;">
+        <h3 id="profileName"></h3>
+        <button onclick="logout()" style="background:#65676b;">Cerrar Sesión</button>
+    </div>
+</div>
+
+<div id="createPostOverlay" class="modalOverlay" onclick="closePostEditor()">
+    <div class="modal" onclick="event.stopPropagation()">
+        <h3 style="margin:0">Nuevo Recuerdo</h3>
+        <textarea id="pText" rows="4" placeholder="¿Qué quieres guardar?"></textarea>
+        <button onclick="savePost()">Publicar</button>
+    </div>
+</div>
+
+<script>
+const supabaseUrl = 'https://nbtqwuvutulkcyxztjidh.supabase.co';
+const supabaseKey = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5idHF3dnV0dWxrY3l4enRqaWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNDUxNzIsImV4cCI6MjA4NzYyMTE3Mn0.e9Gn9xMUI3OQzzoIm9_O3yry4jI8t3FOdP5ao3pMARE';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+async function handleAuth() {
+    const name = document.getElementById("newName").value.trim();
+    const email = document.getElementById("newEmail").value.trim();
+    const pin = document.getElementById("newPin").value;
+    if(!name || !email) return alert("Faltan datos.");
+    
+    const userData = { id: "u_" + Date.now(), name, email, isadmin: (pin === "665321") };
+    await supabase.from('users').upsert([userData], { onConflict: 'email' });
+    
+    currentUser = userData;
+    localStorage.setItem("currentUser", JSON.stringify(currentUser));
+    location.reload();
+}
+
+function logout() { localStorage.removeItem("currentUser"); location.reload(); }
+
+function goTo(section, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('show'));
+    document.getElementById(section).classList.add('show');
+    document.querySelectorAll('.navItem').forEach(d => d.classList.remove('active'));
+    if(el) el.classList.add('active');
+    document.getElementById('btnAdd').style.display = (section === 'capsula' || section === 'denuncias') ? 'block' : 'none';
+    if(section !== 'perfil') renderPosts(section + "Container", section === 'capsula' ? 'posts' : 'denuncias');
+}
+
+async function renderPosts(contId, table) {
+    const { data } = await supabase.from(table).select('*').order('id', { ascending: false });
+    document.getElementById(contId).innerHTML = data ? data.map(p => `
+        <div class="card">
+            <div class="post-header"><strong>${p.authorname}</strong></div>
+            <p>${p.contenido}</p>
+        </div>
+    `).join('') : "<p>No hay datos.</p>";
+}
+
+async function savePost() {
+    const text = document.getElementById("pText").value;
+    const isDen = document.getElementById('denuncias').classList.contains('show');
+    await supabase.from(isDen ? 'denuncias' : 'posts').insert([{
+        contenido: text, authorid: currentUser.id, authorname: currentUser.name
+    }]);
+    closePostEditor();
+    goTo(isDen ? 'denuncias' : 'capsula');
+}
+
+function openPostEditor() { document.getElementById("createPostOverlay").style.display = "flex"; }
+function closePostEditor() { document.getElementById("createPostOverlay").style.display = "none"; }
+
+(function init() {
+    if(currentUser) {
+        document.getElementById("loginScreen").classList.remove("show");
+        document.getElementById("mainHeader").classList.remove("hidden");
+        document.getElementById("profileName").innerText = currentUser.name;
+        goTo("capsula", document.querySelector('[data-section="capsula"]'));
+    }
+})();
+</script>
+</body>
+</html>
+
