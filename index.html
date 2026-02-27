@@ -91,7 +91,6 @@ async function handleAuth() {
     const isadmin = (email === "marianonikolajczuk@gmail.com" && pin === "665321");
     
     try {
-        // 1. Buscamos si el usuario ya existe
         const { data: existingUsers, error: searchError } = await supabase
             .from('users')
             .select('*')
@@ -99,22 +98,22 @@ async function handleAuth() {
 
         if (searchError) throw searchError;
 
-        let finalUserId = "u_" + Date.now(); // ID temporal si es nuevo
+        let finalUserId = "u_" + Date.now(); 
 
         if (existingUsers && existingUsers.length > 0) {
-            // Ya existe, lo dejamos pasar y tomamos su ID
             finalUserId = existingUsers[0].id || finalUserId;
         } else {
-            // No existe, lo creamos enviando SOLO las columnas que tenés en tu tabla
+            // ACÁ ESTABA EL ERROR: Ahora sí mandamos el ID y el Nombre
             const { error: insertError } = await supabase
                 .from('users')
-                .insert([{ email: email, password: pin, isadmin: isadmin }]);
+                .insert([{ id: finalUserId, name: name, email: email, password: pin, isadmin: isadmin }]);
             
-            // Si hay un error al insertar, lo mostramos pero no lo frenamos
-            if (insertError) console.log("Detalle de base de datos:", insertError.message);
+            if (insertError) {
+                alert("Error al crear usuario: " + insertError.message);
+                return;
+            }
         }
         
-        // Guardamos todos los datos en la sesión local (incluido el nombre)
         currentUser = { id: finalUserId, name: name, email: email, isadmin: isadmin };
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
         location.reload();
@@ -142,15 +141,15 @@ function goTo(section, el) {
 }
 
 async function renderPosts(contId, table) {
-    const { data, error } = await supabase.from(table).select('*').order('id', { ascending: false });
+    const { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false });
     if (error) {
         document.getElementById(contId).innerHTML = "<p>Error cargando datos.</p>";
         return;
     }
     document.getElementById(contId).innerHTML = (data && data.length > 0) ? data.map(p => `
         <div class="card">
-            <div class="post-header"><strong>${p.authorname}</strong></div>
-            <p>${p.contenido}</p>
+            <div class="post-header"><strong>${p.authorname || 'Anónimo'}</strong></div>
+            <p>${p.content}</p> 
         </div>
     `).join('') : "<p>Aún no hay registros aquí.</p>";
 }
@@ -163,7 +162,7 @@ async function savePost() {
     const table = isDen ? 'denuncias_publicas' : 'posts';
     
     const { error } = await supabase.from(table).insert([{
-        contenido: text, authorid: currentUser.id, authorname: currentUser.name
+        content: text, authorid: currentUser.id, authorname: currentUser.name
     }]);
     
     if(error) {
