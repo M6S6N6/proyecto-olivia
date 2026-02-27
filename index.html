@@ -72,8 +72,9 @@
 </div>
 
 <script>
-const supabaseUrl = 'https://nbtqwuvutulkcyxztjidh.supabase.co';
-const supabaseKey = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5idHF3dnV0dWxrY3l4enRqaWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNDUxNzIsImV4cCI6MjA4NzYyMTE3Mn0.e9Gn9xMUI3OQzzoIm9_O3yry4jI8t3FOdP5ao3pMARE';
+// ACÁ ESTÁN TUS LLAVES NUEVAS CONECTADAS
+const supabaseUrl = 'https://dikejwmeivfmwjppipum.supabase.co';
+const supabaseKey = 'sb_publishable_6Wl3H9Iuh9dh_qtn-q0UDQ_qXqNxgMN';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 let currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -103,7 +104,6 @@ async function handleAuth() {
         if (existingUsers && existingUsers.length > 0) {
             finalUserId = existingUsers[0].id || finalUserId;
         } else {
-            // ACÁ ESTABA EL ERROR: Ahora sí mandamos el ID y el Nombre
             const { error: insertError } = await supabase
                 .from('users')
                 .insert([{ id: finalUserId, name: name, email: email, password: pin, isadmin: isadmin }]);
