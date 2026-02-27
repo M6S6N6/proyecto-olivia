@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Proyecto Olivia - Live</title>
+    <title>Proyecto Olivia</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root{ --azul:#1877f2; --fondo-fb: #f0f2f5; --texto-principal: #050505; --texto-secundario: #65676b; --borde-fb: #dadde1; }
@@ -22,6 +22,7 @@
         input, textarea{ width:100%; padding:12px; margin-top:8px; border-radius:8px; border:1px solid var(--borde-fb); font-size: 16px; }
         button{ padding:12px; border:none; border-radius:8px; background:var(--azul); color:white; font-weight: bold; width: 100%; cursor:pointer; margin-top: 10px; }
         .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .post-header img { width: 40px; height: 40px; border-radius: 50%; background: #eee; }
         .modalOverlay{ position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:4000; padding: 20px; }
         .modal{ background:#fff; border-radius:12px; padding:20px; width:100%; max-width:400px; }
         .hidden { display: none; }
@@ -44,7 +45,7 @@
 
 <div id="loginScreen" class="section show">
     <div class="card">
-        <h2 style="margin-top:0; color:var(--azul);">Bienvenido</h2>
+        <h2 style="margin-top:0; color:var(--azul);">Bienvenido a la Cápsula</h2>
         <input id="newName" placeholder="Nombre completo" />
         <input id="newEmail" type="email" placeholder="Correo electrónico" />
         <input id="newPin" type="password" placeholder="PIN" />
@@ -57,14 +58,15 @@
 <div id="perfil" class="section">
     <div class="card" style="text-align:center;">
         <h3 id="profileName"></h3>
+        <p id="profileRole" style="color:var(--texto-secundario); font-size:14px;"></p>
         <button onclick="logout()" style="background:#65676b;">Cerrar Sesión</button>
     </div>
 </div>
 
 <div id="createPostOverlay" class="modalOverlay" onclick="closePostEditor()">
     <div class="modal" onclick="event.stopPropagation()">
-        <h3 style="margin:0">Nuevo Recuerdo</h3>
-        <textarea id="pText" rows="4" placeholder="¿Qué quieres guardar?"></textarea>
+        <h3 style="margin:0">Nuevo Registro</h3>
+        <textarea id="pText" rows="4" placeholder="¿Qué querés publicar?"></textarea>
         <button onclick="savePost()">Publicar</button>
     </div>
 </div>
@@ -78,16 +80,27 @@ let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
 async function handleAuth() {
     const name = document.getElementById("newName").value.trim();
-    const email = document.getElementById("newEmail").value.trim();
+    const email = document.getElementById("newEmail").value.trim().toLowerCase();
     const pin = document.getElementById("newPin").value;
-    if(!name || !email) return alert("Faltan datos.");
     
-    const userData = { id: "u_" + Date.now(), name, email, isadmin: (pin === "665321") };
-    await supabase.from('users').upsert([userData], { onConflict: 'email' });
+    if(!name || !email) {
+        alert("Por favor, completá tu nombre y correo.");
+        return;
+    }
     
-    currentUser = userData;
-    localStorage.setItem("currentUser", JSON.stringify(currentUser));
-    location.reload();
+    const isadmin = (email === "marianonikolajczuk@gmail.com" && pin === "665321");
+    const userData = { id: "u_" + Date.now(), name: name, email: email, isadmin: isadmin };
+    
+    try {
+        const { error } = await supabase.from('users').upsert([userData], { onConflict: 'email' });
+        if (error) throw error;
+        
+        currentUser = userData;
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        location.reload();
+    } catch (err) {
+        alert("Error de conexión. Detalle: " + err.message);
+    }
 }
 
 function logout() { localStorage.removeItem("currentUser"); location.reload(); }
@@ -97,28 +110,48 @@ function goTo(section, el) {
     document.getElementById(section).classList.add('show');
     document.querySelectorAll('.navItem').forEach(d => d.classList.remove('active'));
     if(el) el.classList.add('active');
-    document.getElementById('btnAdd').style.display = (section === 'capsula' || section === 'denuncias') ? 'block' : 'none';
-    if(section !== 'perfil') renderPosts(section + "Container", section === 'capsula' ? 'posts' : 'denuncias');
+    
+    const isAdminUser = currentUser && currentUser.isadmin;
+    document.getElementById('btnAdd').style.display = (isAdminUser && (section === 'capsula' || section === 'denuncias')) ? 'block' : 'none';
+    
+    if(section !== 'perfil') {
+        const targetTable = section === 'capsula' ? 'posts' : 'denuncias_publicas';
+        renderPosts(section + "Container", targetTable);
+    }
 }
 
 async function renderPosts(contId, table) {
-    const { data } = await supabase.from(table).select('*').order('id', { ascending: false });
-    document.getElementById(contId).innerHTML = data ? data.map(p => `
+    const { data, error } = await supabase.from(table).select('*').order('id', { ascending: false });
+    if (error) {
+        document.getElementById(contId).innerHTML = "<p>Error cargando datos.</p>";
+        return;
+    }
+    document.getElementById(contId).innerHTML = (data && data.length > 0) ? data.map(p => `
         <div class="card">
             <div class="post-header"><strong>${p.authorname}</strong></div>
             <p>${p.contenido}</p>
         </div>
-    `).join('') : "<p>No hay datos.</p>";
+    `).join('') : "<p>Aún no hay registros aquí.</p>";
 }
 
 async function savePost() {
     const text = document.getElementById("pText").value;
+    if(!text) return;
+    
     const isDen = document.getElementById('denuncias').classList.contains('show');
-    await supabase.from(isDen ? 'denuncias' : 'posts').insert([{
+    const table = isDen ? 'denuncias_publicas' : 'posts';
+    
+    const { error } = await supabase.from(table).insert([{
         contenido: text, authorid: currentUser.id, authorname: currentUser.name
     }]);
-    closePostEditor();
-    goTo(isDen ? 'denuncias' : 'capsula');
+    
+    if(error) {
+        alert("Error al publicar: " + error.message);
+    } else {
+        closePostEditor();
+        document.getElementById("pText").value = "";
+        goTo(isDen ? 'denuncias' : 'capsula', document.querySelector(`[data-section="${isDen ? 'denuncias' : 'capsula'}"]`));
+    }
 }
 
 function openPostEditor() { document.getElementById("createPostOverlay").style.display = "flex"; }
@@ -129,9 +162,10 @@ function closePostEditor() { document.getElementById("createPostOverlay").style.
         document.getElementById("loginScreen").classList.remove("show");
         document.getElementById("mainHeader").classList.remove("hidden");
         document.getElementById("profileName").innerText = currentUser.name;
+        document.getElementById("profileRole").innerText = currentUser.isadmin ? "Administrador" : "Usuario";
         goTo("capsula", document.querySelector('[data-section="capsula"]'));
     }
 })();
 </script>
 </body>
-    </html>
+</html>
