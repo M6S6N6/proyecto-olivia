@@ -89,15 +89,36 @@ async function handleAuth() {
     }
     
     const isadmin = (email === "marianonikolajczuk@gmail.com" && pin === "665321");
-    const userData = { id: "u_" + Date.now(), name: name, email: email, isadmin: isadmin };
     
     try {
-        const { error } = await supabase.from('users').upsert([userData], { onConflict: 'email' });
-        if (error) throw error;
+        // 1. Buscamos si el usuario ya existe
+        const { data: existingUsers, error: searchError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email);
+
+        if (searchError) throw searchError;
+
+        let finalUserId = "u_" + Date.now(); // ID temporal si es nuevo
+
+        if (existingUsers && existingUsers.length > 0) {
+            // Ya existe, lo dejamos pasar y tomamos su ID
+            finalUserId = existingUsers[0].id || finalUserId;
+        } else {
+            // No existe, lo creamos enviando SOLO las columnas que tenés en tu tabla
+            const { error: insertError } = await supabase
+                .from('users')
+                .insert([{ email: email, password: pin, isadmin: isadmin }]);
+            
+            // Si hay un error al insertar, lo mostramos pero no lo frenamos
+            if (insertError) console.log("Detalle de base de datos:", insertError.message);
+        }
         
-        currentUser = userData;
+        // Guardamos todos los datos en la sesión local (incluido el nombre)
+        currentUser = { id: finalUserId, name: name, email: email, isadmin: isadmin };
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
         location.reload();
+        
     } catch (err) {
         alert("Error de conexión. Detalle: " + err.message);
     }
