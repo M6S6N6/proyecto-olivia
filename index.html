@@ -76,18 +76,20 @@
 </div>
 
 <script>
-console.log("=== SISTEMA INICIADO ===");
-const supabaseUrl = 'https://dikejwmeivfmwjppipum.supabase.co';
-const supabaseKey = 'sb_publishable_6Wl3H9Iuh9dh_qtn-q0UDQ_qXqNxgMN';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+console.log("=== SISTEMA INICIADO (VERSIÓN INMUNE) ===");
 
-let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+// Usamos 'var' para evitar bloqueos por doble lectura
+var supabaseUrl = 'https://dikejwmeivfmwjppipum.supabase.co';
+var supabaseKey = 'sb_publishable_6Wl3H9Iuh9dh_qtn-q0UDQ_qXqNxgMN';
+var supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
 async function handleAuth() {
     console.log("--> Botón Entrar presionado.");
-    const name = document.getElementById("newName").value.trim();
-    const email = document.getElementById("newEmail").value.trim().toLowerCase();
-    const pin = document.getElementById("newPin").value;
+    var name = document.getElementById("newName").value.trim();
+    var email = document.getElementById("newEmail").value.trim().toLowerCase();
+    var pin = document.getElementById("newPin").value;
     
     console.log("Datos capturados:", { name: name, email: email, pin: pin });
 
@@ -97,12 +99,12 @@ async function handleAuth() {
         return;
     }
     
-    const isadmin = (email === "marianonikolajczuk@gmail.com" && pin === "665321");
+    var isadmin = (email === "marianonikolajczuk@gmail.com" && pin === "665321");
     console.log("Es administrador:", isadmin);
     
     try {
         console.log("Paso 1: Buscando al usuario en Supabase...");
-        const { data: existingUsers, error: searchError } = await supabase
+        var { data: existingUsers, error: searchError } = await supabase
             .from('users')
             .select('*')
             .eq('email', email);
@@ -114,14 +116,14 @@ async function handleAuth() {
 
         console.log("Resultado de búsqueda:", existingUsers);
 
-        let finalUserId = "u_" + Date.now(); 
+        var finalUserId = "u_" + Date.now(); 
 
         if (existingUsers && existingUsers.length > 0) {
             console.log("El usuario ya existe. Autenticando...");
             finalUserId = existingUsers[0].id || finalUserId;
         } else {
             console.log("El usuario no existe. Intentando crear registro en BD...");
-            const { error: insertError } = await supabase
+            var { error: insertError } = await supabase
                 .from('users')
                 .insert([{ id: finalUserId, name: name, email: email, password: pin, isadmin: isadmin }]);
             
@@ -152,17 +154,17 @@ function goTo(section, el) {
     document.querySelectorAll('.navItem').forEach(d => d.classList.remove('active'));
     if(el) el.classList.add('active');
     
-    const isAdminUser = currentUser && currentUser.isadmin;
+    var isAdminUser = currentUser && currentUser.isadmin;
     document.getElementById('btnAdd').style.display = (isAdminUser && (section === 'capsula' || section === 'denuncias')) ? 'block' : 'none';
     
     if(section !== 'perfil') {
-        const targetTable = section === 'capsula' ? 'posts' : 'denuncias_publicas';
+        var targetTable = section === 'capsula' ? 'posts' : 'denuncias_publicas';
         renderPosts(section + "Container", targetTable);
     }
 }
 
 async function renderPosts(contId, table) {
-    const { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false });
+    var { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false });
     if (error) {
         document.getElementById(contId).innerHTML = "<p>Error cargando datos.</p>";
         return;
@@ -176,13 +178,13 @@ async function renderPosts(contId, table) {
 }
 
 async function savePost() {
-    const text = document.getElementById("pText").value;
+    var text = document.getElementById("pText").value;
     if(!text) return;
     
-    const isDen = document.getElementById('denuncias').classList.contains('show');
-    const table = isDen ? 'denuncias_publicas' : 'posts';
+    var isDen = document.getElementById('denuncias').classList.contains('show');
+    var table = isDen ? 'denuncias_publicas' : 'posts';
     
-    const { error } = await supabase.from(table).insert([{
+    var { error } = await supabase.from(table).insert([{
         content: text, authorid: currentUser.id, authorname: currentUser.name
     }]);
     
