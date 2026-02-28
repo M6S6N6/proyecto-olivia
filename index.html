@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Proyecto Olivia</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root{ --azul:#1877f2; --fondo-fb: #f0f2f5; --texto-principal: #050505; --texto-secundario: #65676b; --borde-fb: #dadde1; }
@@ -72,7 +76,7 @@
 </div>
 
 <script>
-// ACÁ ESTÁN TUS LLAVES NUEVAS CONECTADAS
+console.log("=== SISTEMA INICIADO ===");
 const supabaseUrl = 'https://dikejwmeivfmwjppipum.supabase.co';
 const supabaseKey = 'sb_publishable_6Wl3H9Iuh9dh_qtn-q0UDQ_qXqNxgMN';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -80,46 +84,63 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
 async function handleAuth() {
+    console.log("--> Botón Entrar presionado.");
     const name = document.getElementById("newName").value.trim();
     const email = document.getElementById("newEmail").value.trim().toLowerCase();
     const pin = document.getElementById("newPin").value;
     
+    console.log("Datos capturados:", { name: name, email: email, pin: pin });
+
     if(!name || !email) {
+        console.warn("Faltan datos en los campos.");
         alert("Por favor, completá tu nombre y correo.");
         return;
     }
     
     const isadmin = (email === "marianonikolajczuk@gmail.com" && pin === "665321");
+    console.log("Es administrador:", isadmin);
     
     try {
+        console.log("Paso 1: Buscando al usuario en Supabase...");
         const { data: existingUsers, error: searchError } = await supabase
             .from('users')
             .select('*')
             .eq('email', email);
 
-        if (searchError) throw searchError;
+        if (searchError) {
+            console.error("ERROR CRÍTICO AL BUSCAR USUARIO:", searchError);
+            throw searchError;
+        }
+
+        console.log("Resultado de búsqueda:", existingUsers);
 
         let finalUserId = "u_" + Date.now(); 
 
         if (existingUsers && existingUsers.length > 0) {
+            console.log("El usuario ya existe. Autenticando...");
             finalUserId = existingUsers[0].id || finalUserId;
         } else {
+            console.log("El usuario no existe. Intentando crear registro en BD...");
             const { error: insertError } = await supabase
                 .from('users')
                 .insert([{ id: finalUserId, name: name, email: email, password: pin, isadmin: isadmin }]);
             
             if (insertError) {
-                alert("Error al crear usuario: " + insertError.message);
+                console.error("ERROR CRÍTICO AL CREAR USUARIO:", insertError);
+                alert("Error al crear usuario. Revisá la consola flotante.");
                 return;
             }
+            console.log("Usuario creado con éxito en Supabase.");
         }
         
         currentUser = { id: finalUserId, name: name, email: email, isadmin: isadmin };
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        console.log("Sesión guardada en el teléfono. Recargando pantalla...");
         location.reload();
         
     } catch (err) {
-        alert("Error de conexión. Detalle: " + err.message);
+        console.error("ERROR GENERAL ATRAPADO:", err);
+        alert("Error de conexión. Revisá la consola flotante.");
     }
 }
 
@@ -178,12 +199,16 @@ function openPostEditor() { document.getElementById("createPostOverlay").style.d
 function closePostEditor() { document.getElementById("createPostOverlay").style.display = "none"; }
 
 (function init() {
+    console.log("Verificando si hay sesión iniciada...");
     if(currentUser) {
+        console.log("Sesión activa detectada:", currentUser);
         document.getElementById("loginScreen").classList.remove("show");
         document.getElementById("mainHeader").classList.remove("hidden");
         document.getElementById("profileName").innerText = currentUser.name;
         document.getElementById("profileRole").innerText = currentUser.isadmin ? "Administrador" : "Usuario";
         goTo("capsula", document.querySelector('[data-section="capsula"]'));
+    } else {
+        console.log("No hay sesión. Esperando login del usuario.");
     }
 })();
 </script>
