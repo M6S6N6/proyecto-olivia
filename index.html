@@ -173,24 +173,28 @@ body.dark-mode .pin-input { color: white !important; }
   </div>
 </div>
 <div id="createPostOverlay" class="modalOverlay" onclick="closePostEditor()">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--borde-fb); padding-bottom:10px;">
-      <h3 style="margin:0; font-size:18px; color:var(--azul);">Nuevo Registro</h3>
-      <button onclick="closePostEditor()" style="background:transparent; color:var(--texto-secundario); font-size:24px; padding:0; width:auto; margin:0;">×</button>
-    </div>
+  <div class="modal editor-blanco" onclick="event.stopPropagation()">
+    <h3 style="margin-top:0; text-align:center; color:var(--azul); font-size:20px;">Crear recuerdo</h3>
     
-    <textarea id="pText" placeholder="¿Qué estás pensando?" rows="4" style="border:none; resize:none; font-size:18px; outline:none; padding:5px;"></textarea>
+    <input id="pTitle" placeholder="Título (Opcional)" style="text-align:center; font-weight:bold; font-size:16px; margin-bottom:15px;"/>
     
-    <div class="editor-actions">
-      <div style="display:flex; gap:10px;">
-        <button class="photo-upload-btn" onclick="alert('Módulo de fotos en proceso de migración a la nube.')" style="margin:0; width:auto;">
+    <textarea id="pText" placeholder="¿Qué le querés decir hoy a la cápsula?" rows="3" style="font-size:16px; border:2px solid black; border-radius:8px; padding:10px;"></textarea>
+    
+    <textarea id="pTextBelow" placeholder="Texto debajo de la imagen (Opcional)..." rows="2" style="font-size:15px; color:var(--texto-secundario); margin-top:10px; border:1px solid var(--borde-fb); border-radius:8px; padding:10px;"></textarea>
+    
+    <div class="editor-actions" style="border-top:none; padding-top:10px;">
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="photo-upload-btn" onclick="alert('Módulo de fotos en proceso de migración a la nube.')" style="margin:0; width:auto; padding:4px;">
           <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
         </button>
-        <button class="photo-upload-btn" onclick="attachGPS()" style="color: red; margin:0; width:auto;" title="Adjuntar Ubicación">
+        <button class="photo-upload-btn" onclick="attachGPS()" style="color: red; margin:0; width:auto; padding:4px;" title="Adjuntar Ubicación">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
         </button>
       </div>
-      <button onclick="savePost()" style="width:auto; margin:0;">Publicar</button>
+      <div style="display:flex; gap:10px;">
+        <button onclick="closePostEditor()" class="btnLight" style="margin:0; font-weight:bold;">Cancelar</button>
+        <button onclick="savePost()" style="margin:0; font-weight:bold; padding: 10px 20px;">Publicar</button>
+      </div>
     </div>
   </div>
 </div>
