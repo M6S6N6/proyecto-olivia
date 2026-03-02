@@ -1,192 +1,430 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Proyecto Olivia</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Proyecto Olivia - Denuncias y Menú</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root{ --azul:#1877f2; --fondo-fb: #f0f2f5; --texto-principal: #050505; --texto-secundario: #65676b; --borde-fb: #dadde1; }
-        *{ box-sizing:border-box; }
-        body{ margin:0; font-family: -apple-system, system-ui, sans-serif; background:var(--fondo-fb); color:var(--texto-principal); }
-        header{ background:white; position:fixed; width:100%; top:0; z-index:1000; border-bottom:1px solid var(--borde-fb); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .brandbar{ padding: 0 16px; display:flex; align-items:center; justify-content:space-between; height: 56px; }
-        #brandTitle{ font-size: 26px; font-weight: 900; color:var(--azul); font-family: 'Brush Script MT', cursive; italic; margin: 0; }
-        .navbar{ display:flex; justify-content:space-around; border-top: 1px solid rgba(0,0,0,0.05); }
-        .navItem{ cursor:pointer; padding: 12px; font-size: 13px; font-weight: 600; color: var(--texto-secundario); flex: 1; text-align: center; position: relative; }
-        .navItem.active{ color: var(--azul); }
-        .navItem.active::after{ content:""; position:absolute; left:0; bottom:0; width:100%; height:3px; background: var(--azul); }
-        .section{ padding:110px 10px 20px 10px; display:none; }
-        .show{ display:block; }
-        .card{ background:white; padding:15px; border-radius:8px; margin-bottom:12px; border: 1px solid var(--borde-fb); }
-        input, textarea{ width:100%; padding:12px; margin-top:8px; border-radius:8px; border:1px solid var(--borde-fb); font-size: 16px; }
-        button{ padding:12px; border:none; border-radius:8px; background:var(--azul); color:white; font-weight: bold; width: 100%; cursor:pointer; margin-top: 10px; }
-        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .post-header img { width: 40px; height: 40px; border-radius: 50%; background: #eee; }
-        .modalOverlay{ position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:4000; padding: 20px; }
-        .modal{ background:#fff; border-radius:12px; padding:20px; width:100%; max-width:400px; }
-        .hidden { display: none; }
-        .btn-add { background: none; color: var(--azul); border: 1px solid var(--azul); border-radius: 50%; width: 35px; height: 35px; font-size: 24px; display: none; }
-    </style>
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{ 
+  --azul:#1877f2; 
+  --fondo-fb: #f0f2f5; 
+  --texto-principal: #050505; 
+  --texto-secundario: #65676b; 
+  --borde-fb: #dadde1; 
+  --fondo-oscuro: #1c1917; 
+  --tarjeta-oscura: #292524; 
+  --texto-claro: #f5f5f5; 
+  --borde-oscuro: #44403c; 
+}
+*{ box-sizing:border-box; }
+body{ margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background:var(--fondo-fb); color:var(--texto-principal); transition: background-color 0.3s, color 0.3s; }
+
+body.dark-mode { background: var(--fondo-oscuro); color: var(--texto-claro); }
+body.dark-mode header { background: #171412; border-bottom: 1px solid var(--borde-oscuro); }
+body.dark-mode #brandTitle { color: var(--texto-claro); }
+body.dark-mode .navItem { color: #8a837e; }
+body.dark-mode .navItem.active { color: var(--texto-claro); }
+body.dark-mode .navItem.active::after { background: var(--texto-claro); }
+body.dark-mode .card { background: var(--tarjeta-oscura); border: 1px solid var(--borde-oscuro); color: var(--texto-claro); }
+body.dark-mode input, body.dark-mode textarea, body.dark-mode select { background: #171412; color: var(--texto-claro); border: 1px solid var(--borde-oscuro); }
+
+header{ background:white; position:fixed; width:100%; top:0; z-index:1000; border-bottom:1px solid var(--borde-fb); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+/* PROYECTO OLIVIA A LA IZQUIERDA Y BOTÓN + A LA DERECHA */
+.brandbar{ padding:12px 16px 8px 16px; display:flex; align-items:center; justify-content:space-between; }
+#brandTitle{ font-size: 28px; font-weight: 900; color:var(--azul); letter-spacing: -0.5px; font-family: 'Brush Script MT', 'Comic Sans MS', cursive; font-style: italic; margin: 0; }
+
+.header-add-btn { background: transparent; color: var(--azul); border: 2px solid var(--azul); border-radius: 50%; width: 32px; height: 32px; display: none; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+.header-add-btn svg { width: 16px; height: 16px; stroke: var(--azul); stroke-width: 2.5; stroke-linecap: round; }
+
+.navbar{ display:flex; justify-content:space-around; align-items: stretch; padding:0; border-top: 1px solid rgba(0,0,0,0.05); }
+.navItem{ cursor:pointer; padding: 10px 2px; font-size: 13px; font-weight: 600; color: var(--texto-secundario); text-align: center; flex: 1; display: flex; align-items: center; justify-content: center; position: relative; line-height: 1.1; }
+.navItem.active{ color: var(--azul); }
+.navItem.active::after{ content:""; position:absolute; left:0; bottom:0; width:100%; height:1.8px; background: var(--azul); }
+
+.navItem.profile-btn { flex: 0 0 auto; padding: 0 10px; }
+.nav-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid var(--borde-fb); }
+body.dark-mode .nav-avatar { border-color: var(--borde-oscuro); }
+
+.nav-badge { position: absolute; top: 2px; right: 8px; background: var(--azul); color: white; border-radius: 50%; min-width: 18px; height: 18px; font-size: 11px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; padding: 0 4px;}
+body.dark-mode .nav-badge { border-color: #171412; }
+
+.notification-item { padding: 12px 16px; border-bottom: 1px solid var(--borde-fb); cursor: pointer; display: flex; align-items: flex-start; gap: 12px; }
+body.dark-mode .notification-item { border-bottom: 1px solid var(--borde-oscuro); }
+.notification-item.unread { background-color: rgba(24, 119, 242, 0.08); }
+body.dark-mode .notification-item.unread { background-color: rgba(24, 119, 242, 0.15); }
+.notification-icon { font-size: 20px; line-height: 1; margin-top: 2px; }
+.notification-content { flex: 1; font-size: 14px; line-height: 1.3;}
+.notification-time { font-size: 12px; color: var(--texto-secundario); margin-top: 4px; }
+
+.section{ padding:110px 10px 20px 10px; display:none; }
+.show{ display:block; }
+.card{ background:white; padding:12px 16px; border-radius:8px; margin-bottom:12px; border: 1px solid var(--borde-fb); }
+input, textarea, select{ width:100%; padding:10px; margin-top:5px; margin-bottom:10px; border-radius:6px; border:1px solid var(--borde-fb); font-size: 15px; }
+button{ padding:10px 16px; border:none; border-radius:6px; background:var(--azul); color:white; font-weight: 600; cursor:pointer; }
+.btnDanger{ background:#e41e3f; color: white; }
+.btnLight{ background:#e4e6eb; color:#050505; }
+body.dark-mode .btnLight { background: #44403c; color: white; border: 1px solid #57534e; }
+.hidden{display:none;}
+
+#pText::placeholder, #pTextBelow::placeholder { color: var(--azul); font-size: 17px; font-style: italic; opacity: 0.85; }
+.editor-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid var(--borde-fb); padding-top: 10px; }
+.photo-upload-btn { display: flex; align-items: center; justify-content: center; cursor: pointer; background: none; border: none; padding: 8px; border-radius: 50%; }
+.photo-upload-btn svg { width: 28px; height: 28px; fill: none; stroke: var(--texto-secundario); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.post-image-grid { display: grid; gap: 2px; margin-top: 10px; border-radius: 8px; overflow: hidden; max-height: 350px; width: 100%; }
+.grid-1 { grid-template-columns: 1fr; } .grid-1 img { width: 100%; height: 350px; object-fit: cover; }
+.grid-2 { grid-template-columns: 1fr 1fr; } .grid-2 img { width: 100%; height: 350px; object-fit: cover; }
+
+.post-header { display: flex; align-items: center; gap: 12px; background-color: rgba(24, 119, 242, 0.3); margin: -12px -16px 12px -16px; padding: 8px 16px; border-bottom: 1px solid var(--borde-fb); border-radius: 8px 8px 0 0; }
+body.dark-mode .post-header { background-color: rgba(24, 119, 242, 0.2); border-bottom-color: var(--borde-oscuro); }
+.post-header img { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(0,0,0,0.1); }
+.post-header-info { display: flex; flex-direction: column; justify-content: center; }
+.post-author-name { font-weight: 700; font-size: 15px; color: var(--azul); line-height: 1.2;}
+.post-date { font-weight: 700; font-size: 13px; color: var(--azul); margin-top: 2px; line-height: 1.3;}
+.post-title-display { text-align: center; font-weight: bold; text-decoration: underline; font-size: 18px; margin: 10px 0; border-bottom: 1px solid var(--borde-fb); padding-bottom: 10px; }
+.post-text { white-space: pre-wrap; margin-top: 8px; margin-bottom: 8px; font-size: 15px; line-height: 1.4; }
+
+.interaction-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--borde-fb); flex-wrap: nowrap; position: relative;}
+.reactions-wrapper { position: relative; display: flex; align-items: center; gap: 8px; }
+.reactions-floating-menu { position: absolute; bottom: 30px; left: 0; background: white; border-radius: 30px; padding: 6px 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; gap: 10px; z-index: 100; border: 1px solid var(--borde-fb); }
+.reactions-floating-menu.show { display: flex; }
+body.dark-mode .reactions-floating-menu { background: var(--tarjeta-oscura); border-color: var(--borde-oscuro); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+.reaction-icon { font-size: 22px; cursor: pointer; transition: transform 0.2s; }
+.reaction-icon:hover { transform: scale(1.2); }
+.reaction-action-btn { background: transparent; border: none; font-weight: bold; color: var(--texto-secundario); font-size: 14px; cursor: pointer; padding: 0; outline: none;}
+.reaction-action-btn.reacted { color: var(--azul); }
+.reaction-summary { display: flex; align-items: center; gap: 4px; font-size: 14px; color: var(--texto-secundario); }
+
+.comment-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--borde-fb); display: none; }
+body.dark-mode .comment-section { border-top: 1px solid var(--borde-oscuro); }
+.comment-section.active { display: block; }
+.comment-bubble { background: #f0f2f5; padding: 10px 14px; border-radius: 18px; margin-bottom: 2px; font-size: 15px; display: inline-block; width: auto; max-width: 100%; word-wrap: break-word; position: relative; }
+body.dark-mode .comment-bubble { background: #3a3b3c; border: none; color: #e4e6eb; }
+.comment-author { font-weight: 700; color: var(--texto-principal); margin-right: 5px; }
+body.dark-mode .comment-author { color: #e4e6eb; }
+.global-comment-input { display: flex; gap: 8px; margin-top: 15px; align-items: center; border-top: 1px solid var(--borde-fb); padding-top: 10px; flex-wrap: wrap;}
+body.dark-mode .global-comment-input { border-top-color: var(--borde-oscuro); }
+.global-comment-input input { margin: 0; flex: 1; height: 36px; border-radius: 18px; background: var(--fondo-fb); border: none; padding: 0 15px; min-width: 0; }
+body.dark-mode .global-comment-input input { background: #3a3b3c; color: #e4e6eb; }
+.global-comment-input button { background: transparent; color: #65676b; font-weight: bold; padding: 0 10px; border: none; font-size: 14px; cursor: pointer; }
+body.dark-mode .global-comment-input button { color: #b0b3b8; }
+
+.index-title { text-align: center; text-decoration: underline; text-underline-offset: 4px; margin-top: 0; margin-bottom: 20px; font-size: 22px; }
+.index-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--borde-fb); cursor: pointer; }
+body.dark-mode .index-row { border-bottom: 1px solid var(--borde-oscuro); }
+.index-row-text { font-size: 16px; display: flex; gap: 10px; align-items: baseline; white-space: nowrap; }
+.index-spacer { flex-grow: 1; border-bottom: 2px dotted var(--borde-fb); margin: 0 10px; position: relative; top: -6px; }
+body.dark-mode .index-spacer { border-bottom: 2px dotted var(--borde-oscuro); }
+
+.editor-blanco { background-color: #ffffff !important; color: var(--texto-principal) !important; border: 1px solid var(--borde-fb) !important; }
+.editor-blanco input, .editor-blanco textarea { background-color: #ffffff !important; color: var(--texto-principal) !important; border: 1px solid var(--borde-fb) !important; }
+.editor-blanco label { color: var(--texto-secundario) !important; }
+
+.reader-overlay { position: fixed; inset: 0; background: var(--fondo-oscuro); z-index: 3000; display: none; overflow-y: auto; color: var(--texto-claro); }
+.reader-overlay.show { display: block; }
+.reader-close-btn { position: fixed; top: 15px; right: 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 30px; font-size: 14px; font-weight: bold; z-index: 3020; cursor: pointer; backdrop-filter: blur(5px); }
+.reader-content { padding: 0 0 80px 0; max-width: 100%; margin: 0 auto; }
+.reader-title { text-align: center; font-size: 30px; font-weight: 900; margin: 10px 20px 20px 20px; line-height: 1.2; }
+.reader-subtitle { text-align: center; font-size: 19px; color: #d6d3d1; padding: 0 20px; margin-bottom: 35px; font-style: italic; font-weight: 500; }
+.reader-main-img { width: 100%; max-height: 75vh; object-fit: cover; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+
+.modalOverlay{ position:fixed; inset:0; background:rgba(255,255,255,0.95); display:none; align-items:center; justify-content:center; z-index:4000; }
+body.dark-mode .modalOverlay { background:rgba(0,0,0,0.9); }
+.modal{ width:90%; max-width:400px; background:#fff; border-radius:12px; padding:20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto;}
+body.dark-mode .modal { background: var(--tarjeta-oscura); border: 1px solid var(--borde-oscuro); color: white;}
+
+/* ESTILOS PERFIL Y PIN */
+.profile-pic-large { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 2px solid var(--azul); margin: 0 auto 15px auto; display: block; }
+.profile-name-title { font-size: 24px; font-weight: 900; color: var(--texto-principal); margin: 0 0 8px 0; }
+.profile-info-text { font-size: 15px; color: var(--texto-secundario); margin: 2px 0 15px 0; }
+.profile-stats-box { display: flex; flex-direction: column; background: var(--fondo-fb); padding: 15px; border-radius: 8px; margin-top: 20px; margin-bottom: 25px; border: 1px solid var(--borde-fb); }
+.stats-top-row { display: flex; justify-content: space-around; border-bottom: 1px solid var(--borde-fb); padding-bottom: 15px; margin-bottom: 15px; }
+.stat-item { text-align: center; }
+.stat-value { font-size: 20px; font-weight: bold; color: var(--azul); display: block; }
+.stat-label { font-size: 12px; color: var(--texto-secundario); font-weight: 600; text-transform: uppercase; }
+
+/* EMOJIS EN UNA SOLA FILA */
+.emoji-breakdown { display: flex; justify-content: center; gap: 20px; font-size: 18px; color: var(--texto-secundario); margin-top: 5px; flex-wrap: wrap; }
+.emoji-row { display: flex; align-items: center; gap: 4px; }
+
+.pin-container { position: relative; width: 100%; }
+.pin-toggle { position: absolute; right: 15px; top: 16px; cursor: pointer; color: var(--texto-secundario); z-index: 10; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;}
+.pin-input { font-size: 24px !important; letter-spacing: 12px; color: black !important; font-weight: 900; padding-right: 50px !important; }
+body.dark-mode .pin-input { color: white !important; }
+</style>
 </head>
 <body>
-
-<header id="mainHeader" class="hidden">
-    <div class="brandbar">
-        <div id="brandTitle">Proyecto Olivia</div>
-        <button id="btnAdd" class="btn-add" onclick="openPostEditor()">+</button>
+<header id="navbar" class="hidden">
+  <div class="brandbar">
+      <div id="brandTitle">Proyecto Olivia</div>
+      <div style="display:flex; align-items:center; gap:12px;">
+          <button id="headerAddBtn" class="header-add-btn" onclick="openPostEditor()">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5V19M5 12H19" /></svg>
+          </button>
+      </div>
+  </div>
+  <div class="navbar">
+    <div class="navItem" data-section="capitulos" onclick="goTo('capitulos', this)">Capítulos</div>
+    <div class="navItem" data-section="denuncias" onclick="goTo('denuncias', this)">Denuncias<br>públicas</div>
+    <div class="navItem" data-section="notificaciones" onclick="goTo('notificaciones', this)">Actividades<div id="navBadge" class="nav-badge">0</div></div>
+    <div class="navItem active" data-section="capsula" onclick="goTo('capsula', this)">Cápsula<br>del tiempo</div>
+    <div class="navItem profile-btn" data-section="perfil" onclick="goTo('perfil', this)">
+        <img id="navProfilePic" class="nav-avatar" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23bcc0c4'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="Perfil">
     </div>
-    <div class="navbar">
-        <div class="navItem" data-section="capsula" onclick="goTo('capsula', this)">Cápsula</div>
-        <div class="navItem" data-section="denuncias" onclick="goTo('denuncias', this)">Denuncias</div>
-        <div class="navItem" data-section="perfil" onclick="goTo('perfil', this)">Perfil</div>
-    </div>
+  </div>
 </header>
 
 <div id="loginScreen" class="section show">
-    <div class="card">
-        <h2 style="margin-top:0; color:var(--azul);">Bienvenido a la Cápsula</h2>
-        <input id="newName" placeholder="Nombre completo" />
-        <input id="newEmail" type="email" placeholder="Correo electrónico" />
-        <input id="newPin" type="password" placeholder="PIN" />
-        <button id="loginBtn" onclick="handleAuth()">Entrar</button>
+  <div class="card">
+    <h2 style="text-align:center; color:var(--azul); font-family: 'Brush Script MT', 'Comic Sans MS', cursive; font-style: italic; font-size: 32px; margin-bottom: 5px;">Proyecto Olivia</h2>
+    <h3 style="text-align:center; color:var(--texto-principal); font-weight: normal; margin-top: 0;">Ingreso</h3>
+    <input id="newName" placeholder="Tu Nombre completo" />
+    <input id="newEmail" type="email" placeholder="Correo electrónico" />
+    
+    <div class="pin-container">
+        <input type="password" id="newPin" class="pin-input" placeholder="PIN (4 dígitos)" />
+        <span class="pin-toggle" onclick="togglePinVisibility()">
+            <svg id="eyeIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </span>
     </div>
+    
+    <button onclick="createUser()" style="width: 100%; margin-top: 15px;">Crear usuario / Ingresar</button>
+  </div>
+</div>
+<div id="createPostOverlay" class="modalOverlay" onclick="closePostEditor()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--borde-fb); padding-bottom:10px;">
+      <h3 style="margin:0; font-size:18px; color:var(--azul);">Nuevo Registro</h3>
+      <button onclick="closePostEditor()" style="background:transparent; color:var(--texto-secundario); font-size:24px; padding:0; width:auto; margin:0;">×</button>
+    </div>
+    
+    <textarea id="pText" placeholder="¿Qué estás pensando?" rows="4" style="border:none; resize:none; font-size:18px; outline:none; padding:5px;"></textarea>
+    
+    <div class="editor-actions">
+      <div style="display:flex; gap:10px;">
+        <button class="photo-upload-btn" onclick="alert('Módulo de fotos en proceso de migración a la nube.')" style="margin:0; width:auto;">
+          <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+        </button>
+        <button class="photo-upload-btn" onclick="attachGPS()" style="color: red; margin:0; width:auto;" title="Adjuntar Ubicación">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        </button>
+      </div>
+      <button onclick="savePost()" style="width:auto; margin:0;">Publicar</button>
+    </div>
+  </div>
 </div>
 
 <div id="capsula" class="section"><div id="capsulaContainer"></div></div>
 <div id="denuncias" class="section"><div id="denunciasContainer"></div></div>
-<div id="perfil" class="section">
-    <div class="card" style="text-align:center;">
-        <h3 id="profileName"></h3>
-        <p id="profileRole" style="color:var(--texto-secundario); font-size:14px;"></p>
-        <button onclick="logout()" style="background:#65676b;">Cerrar Sesión</button>
-    </div>
-</div>
+<div id="capitulos" class="section"><div id="capitulosContainer" style="text-align:center; padding-top:20px; color:var(--texto-secundario);">Capítulos conectando a la base de datos...</div></div>
+<div id="notificaciones" class="section"><div id="notificacionesContainer" style="text-align:center; padding-top:20px; color:var(--texto-secundario);">Actividades en construcción...</div></div>
 
-<div id="createPostOverlay" class="modalOverlay" onclick="closePostEditor()">
-    <div class="modal" onclick="event.stopPropagation()">
-        <h3 style="margin:0">Nuevo Registro</h3>
-        <textarea id="pText" rows="4" placeholder="¿Qué querés publicar?"></textarea>
-        <button onclick="savePost()">Publicar</button>
+<div id="perfil" class="section profile-card-v3">
+  <img id="profileAvatar" class="profile-pic-large" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23bcc0c4'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="Avatar">
+  <h2 id="profileName" class="profile-name-title" style="text-align:center;"></h2>
+  <p id="profileRole" class="profile-info-text" style="text-align:center;"></p>
+  
+  <div class="profile-stats-box">
+    <div class="stats-top-row">
+      <div class="stat-item">
+        <span id="statCapsula" class="stat-value">-</span>
+        <span class="stat-label">Recuerdos</span>
+      </div>
+      <div class="stat-item">
+        <span id="statDenuncias" class="stat-value">-</span>
+        <span class="stat-label">Denuncias</span>
+      </div>
     </div>
+    <div class="stat-label" style="text-align:center; margin-bottom:5px;">Reacciones Recibidas</div>
+    <div id="statEmojis" class="emoji-breakdown">
+      <div class="emoji-row">👍 0</div>
+      <div class="emoji-row">❤️ 0</div>
+      <div class="emoji-row">⭐ 0</div>
+    </div>
+  </div>
+  
+  <button onclick="toggleDarkMode()" class="btnLight" style="margin-bottom: 10px;">Alternar Modo Oscuro</button>
+  <button onclick="logout()" class="btnDanger">Cerrar Sesión</button>
 </div>
 
 <script>
-console.log("=== SISTEMA INICIADO (VERSIÓN INMUNE) ===");
+console.log("=== SISTEMA INICIADO (SUPABASE + GPS VERSIÓN) ===");
 
-// Usamos 'var' para evitar bloqueos por doble lectura
+// =======================================================
+// INICIO DEL MOTOR SUPABASE (SIN LOCALSTORAGE DE DATOS PESADOS)
+// =======================================================
+
 var supabaseUrl = 'https://dikejwmeivfmwjppipum.supabase.co';
 var supabaseKey = 'sb_publishable_6Wl3H9Iuh9dh_qtn-q0UDQ_qXqNxgMN';
 var supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+// Solo dejamos el currentUser para mantener la sesión abierta
 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
+let currentGPS = null;
 
-async function handleAuth() {
-    console.log("--> Botón Entrar presionado.");
+// LÓGICA DEL OJO (PIN)
+function togglePinVisibility() {
+    const pinInput = document.getElementById("newPin");
+    const eyeIcon = document.getElementById("eyeIcon");
+    if (pinInput.type === "password") {
+        pinInput.type = "text";
+        eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+    } else {
+        pinInput.type = "password";
+        eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+    }
+}
+
+// LÓGICA DE GEOLOCALIZACIÓN
+function attachGPS() {
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            currentGPS = { lat: position.coords.latitude, lng: position.coords.longitude };
+            alert("Ubicación GPS adjuntada correctamente para el posteo.");
+        }, function(error) {
+            alert("Error al obtener ubicación. Revisá los permisos del navegador o el GPS de tu celular.");
+        });
+    } else {
+        alert("Tu navegador no soporta geolocalización.");
+    }
+}
+
+// INGRESO A LA BASE DE DATOS (NUEVO MOTOR)
+async function createUser() {
+    console.log("--> Intentando ingresar/crear...");
     var name = document.getElementById("newName").value.trim();
     var email = document.getElementById("newEmail").value.trim().toLowerCase();
     var pin = document.getElementById("newPin").value;
-    
-    console.log("Datos capturados:", { name: name, email: email, pin: pin });
 
-    if(!name || !email) {
-        console.warn("Faltan datos en los campos.");
-        alert("Por favor, completá tu nombre y correo.");
+    if(!name || !email || !pin) {
+        alert("Por favor, completá tu nombre, correo y el PIN.");
         return;
     }
     
     var isadmin = (email === "marianonikolajczuk@gmail.com" && pin === "665321");
-    console.log("Es administrador:", isadmin);
     
     try {
-        console.log("Paso 1: Buscando al usuario en Supabase...");
         var { data: existingUsers, error: searchError } = await supabase
             .from('users')
             .select('*')
             .eq('email', email);
 
-        if (searchError) {
-            console.error("ERROR CRÍTICO AL BUSCAR USUARIO:", searchError);
-            throw searchError;
-        }
-
-        console.log("Resultado de búsqueda:", existingUsers);
+        if (searchError) throw searchError;
 
         var finalUserId = "u_" + Date.now(); 
 
         if (existingUsers && existingUsers.length > 0) {
-            console.log("El usuario ya existe. Autenticando...");
             finalUserId = existingUsers[0].id || finalUserId;
         } else {
-            console.log("El usuario no existe. Intentando crear registro en BD...");
             var { error: insertError } = await supabase
                 .from('users')
                 .insert([{ id: finalUserId, name: name, email: email, password: pin, isadmin: isadmin }]);
             
             if (insertError) {
-                console.error("ERROR CRÍTICO AL CREAR USUARIO:", insertError);
-                alert("Error al crear usuario. Revisá la consola flotante.");
+                alert("Error al crear usuario en Supabase.");
                 return;
             }
-            console.log("Usuario creado con éxito en Supabase.");
         }
         
         currentUser = { id: finalUserId, name: name, email: email, isadmin: isadmin };
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
-        console.log("Sesión guardada en el teléfono. Recargando pantalla...");
         location.reload();
         
     } catch (err) {
-        console.error("ERROR GENERAL ATRAPADO:", err);
-        alert("Error de conexión. Revisá la consola flotante.");
+        console.error("ERROR AL AUTENTICAR:", err);
+        alert("Error de conexión con la nube.");
     }
 }
 
-function logout() { localStorage.removeItem("currentUser"); location.reload(); }
+function logout() { 
+    localStorage.removeItem("currentUser"); 
+    location.reload(); 
+}
 
-function goTo(section, el) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('show'));
-    document.getElementById(section).classList.add('show');
-    document.querySelectorAll('.navItem').forEach(d => d.classList.remove('active'));
-    if(el) el.classList.add('active');
+function openPostEditor() { document.getElementById("createPostOverlay").style.display = "flex"; }
+function closePostEditor() { 
+    document.getElementById("createPostOverlay").style.display = "none"; 
+    currentGPS = null; // Limpiar GPS al cerrar
+}
+// NAVEGACIÓN ENTRE SECCIONES
+function goTo(sectionId, element) {
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('show'));
+    document.getElementById(sectionId).classList.add('show');
     
-    var isAdminUser = currentUser && currentUser.isadmin;
-    document.getElementById('btnAdd').style.display = (isAdminUser && (section === 'capsula' || section === 'denuncias')) ? 'block' : 'none';
+    if(element) {
+        document.querySelectorAll('.navItem').forEach(nav => nav.classList.remove('active'));
+        element.classList.add('active');
+    }
     
-    if(section !== 'perfil') {
-        var targetTable = section === 'capsula' ? 'posts' : 'denuncias_publicas';
-        renderPosts(section + "Container", targetTable);
+    if(sectionId === 'capsula') renderPosts('posts', 'capsulaContainer');
+    if(sectionId === 'denuncias') renderPosts('denuncias_publicas', 'denunciasContainer');
+    if(sectionId === 'perfil') renderProfile();
+}
+
+// RENDERIZADO DESDE SUPABASE (NUEVO MOTOR)
+async function renderPosts(table, containerId) {
+    var container = document.getElementById(containerId);
+    container.innerHTML = "<div style='text-align:center; padding:20px; color:var(--texto-secundario); font-weight:bold;'>Cargando desde la nube...</div>";
+    
+    try {
+        var { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = "<div style='text-align:center; padding:20px; color:var(--texto-secundario);'>No hay publicaciones aún.</div>";
+            return;
+        }
+        
+        container.innerHTML = "";
+        data.forEach(function(p) {
+            var dateStr = new Date(p.created_at).toLocaleString('es-AR', {dateStyle: 'short', timeStyle: 'short'});
+            var gpsHtml = p.gps ? `<div style="font-size:13px; color:red; margin-top:10px; font-weight:bold;">📍 Ubicación GPS: ${p.gps.lat}, ${p.gps.lng}</div>` : "";
+            
+            var html = `
+            <div class="card">
+                <div class="post-header">
+                    <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23bcc0c4'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E">
+                    <div class="post-header-info">
+                        <div class="post-author-name">${p.authorname}</div>
+                        <div class="post-date">${dateStr}</div>
+                    </div>
+                </div>
+                <div class="post-text">${p.content}</div>
+                ${gpsHtml}
+            </div>`;
+            container.innerHTML += html;
+        });
+    } catch(err) {
+        container.innerHTML = "<div style='text-align:center; padding:20px; color:red;'>Error al cargar desde la base de datos.</div>";
+        console.error(err);
     }
 }
 
-async function renderPosts(contId, table) {
-    var { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false });
-    if (error) {
-        document.getElementById(contId).innerHTML = "<p>Error cargando datos.</p>";
-        return;
-    }
-    document.getElementById(contId).innerHTML = (data && data.length > 0) ? data.map(p => `
-        <div class="card">
-            <div class="post-header"><strong>${p.authorname || 'Anónimo'}</strong></div>
-            <p>${p.content}</p> 
-        </div>
-    `).join('') : "<p>Aún no hay registros aquí.</p>";
-}
-
+// GUARDAR POST EN SUPABASE CON GPS INCLUIDO
 async function savePost() {
-    var text = document.getElementById("pText").value;
+    var text = document.getElementById("pText").value.trim();
     if(!text) return;
     
     var isDen = document.getElementById('denuncias').classList.contains('show');
     var table = isDen ? 'denuncias_publicas' : 'posts';
     
-    var { error } = await supabase.from(table).insert([{
-        content: text, authorid: currentUser.id, authorname: currentUser.name
-    }]);
+    var postData = {
+        content: text, 
+        authorid: currentUser.id, 
+        authorname: currentUser.name
+    };
+
+    if (currentGPS) {
+        postData.gps = currentGPS;
+    }
+    
+    var { error } = await supabase.from(table).insert([postData]);
     
     if(error) {
         alert("Error al publicar: " + error.message);
@@ -197,17 +435,22 @@ async function savePost() {
     }
 }
 
-function openPostEditor() { document.getElementById("createPostOverlay").style.display = "flex"; }
-function closePostEditor() { document.getElementById("createPostOverlay").style.display = "none"; }
+// RENDERIZAR PERFIL LIMPIO BÁSICO
+function renderProfile() {
+    if(currentUser) {
+        document.getElementById("profileName").innerText = currentUser.name;
+        document.getElementById("profileRole").innerText = currentUser.isadmin ? "Administrador de Olivia" : "Usuario Activo";
+    }
+}
 
+// INICIALIZACIÓN Y ARRANQUE DE LA APP
 (function init() {
     console.log("Verificando si hay sesión iniciada...");
     if(currentUser) {
         console.log("Sesión activa detectada:", currentUser);
         document.getElementById("loginScreen").classList.remove("show");
-        document.getElementById("mainHeader").classList.remove("hidden");
-        document.getElementById("profileName").innerText = currentUser.name;
-        document.getElementById("profileRole").innerText = currentUser.isadmin ? "Administrador" : "Usuario";
+        document.getElementById("navbar").classList.remove("hidden");
+        renderProfile();
         goTo("capsula", document.querySelector('[data-section="capsula"]'));
     } else {
         console.log("No hay sesión. Esperando login del usuario.");
