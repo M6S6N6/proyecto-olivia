@@ -6,7 +6,6 @@
 <title>Proyecto Olivia - Denuncias y Menú</title>
 
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -77,9 +76,6 @@ body.dark-mode .btnLight { background: #44403c; color: white; border: 1px solid 
 .editor-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid var(--borde-fb); padding-top: 10px; }
 .photo-upload-btn { display: flex; align-items: center; justify-content: center; cursor: pointer; background: none; border: none; padding: 8px; border-radius: 50%; }
 .photo-upload-btn svg { width: 28px; height: 28px; fill: none; stroke: var(--texto-secundario); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.post-image-grid { display: grid; gap: 2px; margin-top: 10px; border-radius: 8px; overflow: hidden; max-height: 350px; width: 100%; }
-.grid-1 { grid-template-columns: 1fr; } .grid-1 img { width: 100%; height: 350px; object-fit: cover; }
-.grid-2 { grid-template-columns: 1fr 1fr; } .grid-2 img { width: 100%; height: 350px; object-fit: cover; }
 
 .post-header { display: flex; align-items: center; gap: 12px; background-color: rgba(24, 119, 242, 0.3); margin: -12px -16px 12px -16px; padding: 8px 16px; border-bottom: 1px solid var(--borde-fb); border-radius: 8px 8px 0 0; }
 body.dark-mode .post-header { background-color: rgba(24, 119, 242, 0.2); border-bottom-color: var(--borde-oscuro); }
@@ -87,34 +83,9 @@ body.dark-mode .post-header { background-color: rgba(24, 119, 242, 0.2); border-
 .post-header-info { display: flex; flex-direction: column; justify-content: center; }
 .post-author-name { font-weight: 700; font-size: 15px; color: var(--azul); line-height: 1.2;}
 .post-date { font-weight: 700; font-size: 13px; color: var(--azul); margin-top: 2px; line-height: 1.3;}
-.post-title-display { text-align: center; font-weight: bold; text-decoration: underline; font-size: 18px; margin: 10px 0; border-bottom: 1px solid var(--borde-fb); padding-bottom: 10px; }
 .post-text { white-space: pre-wrap; margin-top: 8px; margin-bottom: 8px; font-size: 15px; line-height: 1.4; }
 
-.interaction-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--borde-fb); flex-wrap: nowrap; position: relative;}
-.reactions-wrapper { position: relative; display: flex; align-items: center; gap: 8px; }
-.reactions-floating-menu { position: absolute; bottom: 30px; left: 0; background: white; border-radius: 30px; padding: 6px 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; gap: 10px; z-index: 100; border: 1px solid var(--borde-fb); }
-.reactions-floating-menu.show { display: flex; }
-body.dark-mode .reactions-floating-menu { background: var(--tarjeta-oscura); border-color: var(--borde-oscuro); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-.reaction-icon { font-size: 22px; cursor: pointer; transition: transform 0.2s; }
-.reaction-icon:hover { transform: scale(1.2); }
-.reaction-action-btn { background: transparent; border: none; font-weight: bold; color: var(--texto-secundario); font-size: 14px; cursor: pointer; padding: 0; outline: none;}
-.reaction-action-btn.reacted { color: var(--azul); }
-.reaction-summary { display: flex; align-items: center; gap: 4px; font-size: 14px; color: var(--texto-secundario); }
-
-.comment-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--borde-fb); display: none; }
-body.dark-mode .comment-section { border-top: 1px solid var(--borde-oscuro); }
-.comment-section.active { display: block; }
-.comment-bubble { background: #f0f2f5; padding: 10px 14px; border-radius: 18px; margin-bottom: 2px; font-size: 15px; display: inline-block; width: auto; max-width: 100%; word-wrap: break-word; position: relative; }
-body.dark-mode .comment-bubble { background: #3a3b3c; border: none; color: #e4e6eb; }
-.comment-author { font-weight: 700; color: var(--texto-principal); margin-right: 5px; }
-body.dark-mode .comment-author { color: #e4e6eb; }
-.global-comment-input { display: flex; gap: 8px; margin-top: 15px; align-items: center; border-top: 1px solid var(--borde-fb); padding-top: 10px; flex-wrap: wrap;}
-body.dark-mode .global-comment-input { border-top-color: var(--borde-oscuro); }
-.global-comment-input input { margin: 0; flex: 1; height: 36px; border-radius: 18px; background: var(--fondo-fb); border: none; padding: 0 15px; min-width: 0; }
-body.dark-mode .global-comment-input input { background: #3a3b3c; color: #e4e6eb; }
-.global-comment-input button { background: transparent; color: #65676b; font-weight: bold; padding: 0 10px; border: none; font-size: 14px; cursor: pointer; }
-body.dark-mode .global-comment-input button { color: #b0b3b8; }
-
+/* CAPITULOS Y LECTOR OSCURO */
 .index-title { text-align: center; text-decoration: underline; text-underline-offset: 4px; margin-top: 0; margin-bottom: 20px; font-size: 22px; }
 .index-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--borde-fb); cursor: pointer; }
 body.dark-mode .index-row { border-bottom: 1px solid var(--borde-oscuro); }
@@ -132,7 +103,6 @@ body.dark-mode .index-spacer { border-bottom: 2px dotted var(--borde-oscuro); }
 .reader-content { padding: 0 0 80px 0; max-width: 100%; margin: 0 auto; }
 .reader-title { text-align: center; font-size: 30px; font-weight: 900; margin: 10px 20px 20px 20px; line-height: 1.2; }
 .reader-subtitle { text-align: center; font-size: 19px; color: #d6d3d1; padding: 0 20px; margin-bottom: 35px; font-style: italic; font-weight: 500; }
-.reader-main-img { width: 100%; max-height: 75vh; object-fit: cover; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
 
 .modalOverlay{ position:fixed; inset:0; background:rgba(255,255,255,0.95); display:none; align-items:center; justify-content:center; z-index:4000; }
 body.dark-mode .modalOverlay { background:rgba(0,0,0,0.9); }
@@ -152,6 +122,10 @@ body.dark-mode .modal { background: var(--tarjeta-oscura); border: 1px solid var
 /* EMOJIS EN UNA SOLA FILA */
 .emoji-breakdown { display: flex; justify-content: center; gap: 20px; font-size: 18px; color: var(--texto-secundario); margin-top: 5px; flex-wrap: wrap; }
 .emoji-row { display: flex; align-items: center; gap: 4px; }
+
+/* FIX: ESTILOS PARA EDICIÓN DE PERFIL */
+.edit-profile-btn { margin-top: 10px; width: 100%; background: var(--fondo-fb); color: var(--texto-principal); border: 1px solid var(--borde-fb); font-weight: 600; padding: 8px; border-radius: 6px; cursor: pointer;}
+body.dark-mode .edit-profile-btn { background: #3a3b3c; color: white; border-color: var(--borde-oscuro); }
 
 .pin-container { position: relative; width: 100%; }
 .pin-toggle { position: absolute; right: 15px; top: 16px; cursor: pointer; color: var(--texto-secundario); z-index: 10; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px;}
@@ -220,10 +194,49 @@ body.dark-mode .pin-input { color: white !important; }
   </div>
 </div>
 
+<div id="readerOverlay" class="reader-overlay">
+  <button class="reader-close-btn" onclick="closeReader()">Volver</button>
+  <div class="reader-content" id="readerContentContainer"></div>
+</div>
+
+<div id="editProfileOverlay" class="modalOverlay" onclick="closeEditProfile()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3 style="margin-top:0; color:var(--azul);">Editar Perfil</h3>
+    <label>Foto de perfil (URL o Base64):</label>
+    <input id="editPicUrl" placeholder="Pegar enlace de imagen..." />
+    <label>Provincia:</label>
+    <select id="editProvincia">
+      <option value="">Seleccionar...</option>
+      <option value="Buenos Aires">Buenos Aires</option>
+      <option value="CABA">CABA</option>
+      <option value="Córdoba">Córdoba</option>
+      <option value="Santa Fe">Santa Fe</option>
+      <option value="Mendoza">Mendoza</option>
+    </select>
+    <div style="display:flex; gap:10px; margin-top:15px;">
+      <button onclick="saveProfileEdit()" style="flex:1;">Guardar</button>
+      <button onclick="closeEditProfile()" class="btnLight" style="flex:1;">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <div id="capsula" class="section"><div id="capsulaContainer"></div></div>
 <div id="denuncias" class="section"><div id="denunciasContainer"></div></div>
-<div id="capitulos" class="section"><div id="capitulosContainer" style="text-align:center; padding-top:20px; color:var(--texto-secundario);">Capítulos conectando a la base de datos...</div></div>
-<div id="notificaciones" class="section"><div id="notificacionesContainer" style="text-align:center; padding-top:20px; color:var(--texto-secundario);">Actividades en construcción...</div></div>
+
+<div id="capitulos" class="section">
+  <div style="text-align:center; margin-bottom: 20px;">
+    <button id="addChapterBtn" class="btnLight" onclick="alert('Editor de capítulos en la nube en desarrollo.')" style="display:none; margin: 0 auto;">+ Redactar nuevo fragmento</button>
+  </div>
+  <div id="capitulosContainer" style="padding-top:10px;">
+    <div style='text-align:center; padding:20px; color:var(--texto-secundario);'>No hay capítulos disponibles en la nube.</div>
+  </div>
+</div>
+
+<div id="notificaciones" class="section">
+  <div id="notificacionesContainer">
+    <div style='text-align:center; padding:20px; color:var(--texto-secundario);'>No hay actividades recientes.</div>
+  </div>
+</div>
 
 <div id="perfil" class="section profile-card-v3">
   <img id="profileAvatar" class="profile-pic-large" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23bcc0c4'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="Avatar">
@@ -249,22 +262,21 @@ body.dark-mode .pin-input { color: white !important; }
     </div>
   </div>
   
-  <button onclick="toggleDarkMode()" class="btnLight" style="margin-bottom: 10px;">Alternar Modo Oscuro</button>
-  <button onclick="logout()" class="btnDanger">Cerrar Sesión</button>
+  <button onclick="openEditProfile()" class="edit-profile-btn">Editar Perfil</button>
+  <button onclick="toggleDarkMode()" class="btnLight" style="margin-bottom: 10px; margin-top: 10px; width: 100%;">Alternar Modo Oscuro</button>
+  <button onclick="logout()" class="btnDanger" style="width: 100%;">Cerrar Sesión</button>
 </div>
 
 <script>
-console.log("=== SISTEMA INICIADO (SUPABASE + GPS VERSIÓN) ===");
+console.log("=== SISTEMA INICIADO (SUPABASE + ERUDA PROTEGIDO) ===");
 
 // =======================================================
-// INICIO DEL MOTOR SUPABASE (SIN LOCALSTORAGE DE DATOS PESADOS)
+// INICIO DEL MOTOR SUPABASE
 // =======================================================
-
 var supabaseUrl = 'https://dikejwmeivfmwjppipum.supabase.co';
 var supabaseKey = 'sb_publishable_6Wl3H9Iuh9dh_qtn-q0UDQ_qXqNxgMN';
 var supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// Solo dejamos el currentUser para mantener la sesión abierta
 var currentUser = JSON.parse(localStorage.getItem("currentUser"));
 let currentGPS = null;
 
@@ -295,7 +307,7 @@ function attachGPS() {
     }
 }
 
-// INGRESO A LA BASE DE DATOS (NUEVO MOTOR)
+// INGRESO A LA BASE DE DATOS
 async function createUser() {
     console.log("--> Intentando ingresar/crear...");
     var name = document.getElementById("newName").value.trim();
@@ -321,6 +333,9 @@ async function createUser() {
 
         if (existingUsers && existingUsers.length > 0) {
             finalUserId = existingUsers[0].id || finalUserId;
+            // Actualizar el perfil local con la foto guardada si existiera
+            var dbPic = existingUsers[0].profilepic;
+            var dbProv = existingUsers[0].provincia;
         } else {
             var { error: insertError } = await supabase
                 .from('users')
@@ -332,7 +347,14 @@ async function createUser() {
             }
         }
         
-        currentUser = { id: finalUserId, name: name, email: email, isadmin: isadmin };
+        currentUser = { 
+            id: finalUserId, 
+            name: name, 
+            email: email, 
+            isadmin: isadmin,
+            profilePic: typeof dbPic !== 'undefined' ? dbPic : null,
+            provincia: typeof dbProv !== 'undefined' ? dbProv : null
+        };
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
         location.reload();
         
@@ -342,6 +364,7 @@ async function createUser() {
     }
 }
 
+// FUNCIONES DE VENTANAS Y SESIÓN AISLADAS
 function logout() { 
     localStorage.removeItem("currentUser"); 
     location.reload(); 
@@ -352,6 +375,35 @@ function closePostEditor() {
     document.getElementById("createPostOverlay").style.display = "none"; 
     currentGPS = null; // Limpiar GPS al cerrar
 }
+function openEditProfile() { document.getElementById("editProfileOverlay").style.display = "flex"; }
+function closeEditProfile() { document.getElementById("editProfileOverlay").style.display = "none"; }
+function closeReader() { document.getElementById('readerOverlay').classList.remove('show'); }
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+// EDICIÓN DE PERFIL A LA NUBE
+async function saveProfileEdit() {
+    var newPic = document.getElementById("editPicUrl").value.trim();
+    var newProv = document.getElementById("editProvincia").value;
+    
+    try {
+        var updates = {};
+        if(newPic) updates.profilepic = newPic;
+        if(newProv) updates.provincia = newProv;
+        
+        var { error } = await supabase.from('users').update(updates).eq('id', currentUser.id);
+        if(error) throw error;
+        
+        if(newPic) currentUser.profilePic = newPic;
+        if(newProv) currentUser.provincia = newProv;
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        
+        renderProfile();
+        closeEditProfile();
+        alert("Perfil actualizado correctamente en la nube.");
+    } catch(err) {
+        alert("Error al actualizar perfil: " + err.message);
+    }
+}
+
 // NAVEGACIÓN ENTRE SECCIONES
 function goTo(sectionId, element) {
     document.querySelectorAll('.section').forEach(sec => sec.classList.remove('show'));
@@ -364,7 +416,7 @@ function goTo(sectionId, element) {
     
     if(sectionId === 'capsula') renderPosts('posts', 'capsulaContainer');
     if(sectionId === 'denuncias') renderPosts('denuncias_publicas', 'denunciasContainer');
-    if(sectionId === 'perfil') renderProfile();
+    // Notificaciones y Capítulos tienen su HTML estático protegido si no hay datos.
 }
 
 // RENDERIZADO DESDE SUPABASE (NUEVO MOTOR)
@@ -439,7 +491,14 @@ async function savePost() {
 function renderProfile() {
     if(currentUser) {
         document.getElementById("profileName").innerText = currentUser.name;
-        document.getElementById("profileRole").innerText = currentUser.isadmin ? "Administrador de Olivia" : "Usuario Activo";
+        var roleText = currentUser.isadmin ? "Administrador de Olivia" : "Usuario Activo";
+        if(currentUser.provincia) roleText += " • " + currentUser.provincia;
+        document.getElementById("profileRole").innerText = roleText;
+        
+        if(currentUser.profilePic) {
+            document.getElementById("profileAvatar").src = currentUser.profilePic;
+            document.getElementById("navProfilePic").src = currentUser.profilePic;
+        }
     }
 }
 
@@ -448,8 +507,23 @@ function renderProfile() {
     console.log("Verificando si hay sesión iniciada...");
     if(currentUser) {
         console.log("Sesión activa detectada:", currentUser);
+        
+        // 1. Mostrar menú y ocultar login
         document.getElementById("loginScreen").classList.remove("show");
         document.getElementById("navbar").classList.remove("hidden");
+        
+        // 2. Encender el botón "+" de la cabecera
+        document.getElementById("headerAddBtn").style.display = "flex";
+        
+        // 3. Lógica exclusiva de Administrador
+        if (currentUser.isadmin) {
+            // Activar consola Eruda solo para Admin
+            if (typeof eruda !== "undefined") eruda.init();
+            // Mostrar botón de crear Capítulos
+            var addChapter = document.getElementById("addChapterBtn");
+            if(addChapter) addChapter.style.display = "inline-block";
+        }
+        
         renderProfile();
         goTo("capsula", document.querySelector('[data-section="capsula"]'));
     } else {
